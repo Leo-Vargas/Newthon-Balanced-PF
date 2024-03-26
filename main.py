@@ -1,9 +1,9 @@
 import numpy as np
 from scipy import linalg
-import csv
 from classes import Measurement, StateData
-from functions import hSetup, is_symmetric, checkSensitivity, checkEquality, makeYbus, makeBusConfiguration, calcBusParticipation, printBusParticipation
+from functions import hSetup, makeBusConfiguration
 from JacobianCalculator import JacobianCalculator, ReducedJacobian
+from JacobianCalculatorV2 import JacobianCalculatorV2
 
 # --------------- entry data ---------------
 measurementDict = {
@@ -107,34 +107,42 @@ Ybus = np.array([
 #is_symmetric(Ybus)
 
 busConfiguration = makeBusConfiguration(measurementDict)
-  
-voltage = np.array([1.06, 1.043, 1.022, 1.013, 1.01, 1.012, 1.003, 1.01, 1.051, 1.044, 1.082, 1.057, 1.071, 1.042, 1.038, 1.045, 1.039, 1.028, 1.025, 1.029, 1.032, 1.033, 1.027, 1.022, 1.019, 1.001, 1.026, 1.011, 1.006, 0.995])
-angle = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.115, -14.434, -16.024, -14.434, -15.302, -15.302, -16.191, -16.278, -15.88, -16.188, -16.884, -17.052, -16.852, -16.468, -16.455, -16.662, -16.83, -16.424, -16.842, -15.912, -12.057, -17.136, -18.015])
 
-[hValues, hDataDict] = hSetup(gridTopology, angle, voltage)
+PQ = 0
+PV = 0
+
+for key in measurementDict:
+    if (measurementDict[key].busType == 2):
+        PQ +=1
+    elif measurementDict[key].busType == 1:
+        PV +=1
+
+PQ /=2
+PV /=2
+
+#print(f'PQ buses: {PQ}')
+#print(f'PV buses: {PV}')
+#print('\n')
+  
+voltages = np.array([1.06, 1.043, 1.022, 1.013, 1.01, 1.012, 1.003, 1.01, 1.051, 1.044, 1.082, 1.057, 1.071, 1.042, 1.038, 1.045, 1.039, 1.028, 1.025, 1.029, 1.032, 1.033, 1.027, 1.022, 1.019, 1.001, 1.026, 1.011, 1.006, 0.995])
+angles = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.115, -14.434, -16.024, -14.434, -15.302, -15.302, -16.191, -16.278, -15.88, -16.188, -16.884, -17.052, -16.852, -16.468, -16.455, -16.662, -16.83, -16.424, -16.842, -15.912, -12.057, -17.136, -18.015])
+
+[hValues, hDataDict] = hSetup(gridTopology, angles, voltages)
 
 # --------------- Calculations ---------------
 np.set_printoptions(precision=3)
 jacobian = JacobianCalculator(list(measurementDict.values()), hDataDict, Ybus, hValues, gridTopology, busConfiguration)
-#print(jacobian)
-#print('\n')
- 
-reducedJacobian = ReducedJacobian(jacobian, busConfiguration)
 
-#checkSensitivity(reducedJacobian)
-#print(reducedJacobian)
-#print('\n\n\n')
-#print(reducedJacobian.shape)
+[PA, QA] = JacobianCalculatorV2(Ybus, voltages, angles)
 
+print(jacobian[0:29,0:29])
+print(jacobian.shape)
 
-
-
-evalues, evectors = linalg.eig(reducedJacobian)
-
-evectorsInv = linalg.inv(evectors)
-evaluesMatrix = np.diag(evalues)
-print(evalues)
+print('---------------------barreira--------------------')
+print(PA)
+print('---------------------barreira--------------------')
+print(QA)
 
 
-busParticipation = calcBusParticipation(evectors, evectorsInv)
-printBusParticipation(busParticipation)
+
+
