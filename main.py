@@ -107,22 +107,12 @@ Ybus = np.array([
 #is_symmetric(Ybus)
 
 busConfiguration = makeBusConfiguration(measurementDict)
+busTypes = {
+    'SLACK': np.array([1, ]),
+    'PV': np.array([2, 5, 8, 11, 13]),
+    'PQ': np.array([3, 4, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
+}
 
-PQ = 0
-PV = 0
-
-for key in measurementDict:
-    if (measurementDict[key].busType == 2):
-        PQ +=1
-    elif measurementDict[key].busType == 1:
-        PV +=1
-
-PQ /=2
-PV /=2
-
-#print(f'PQ buses: {PQ}')
-#print(f'PV buses: {PV}')
-#print('\n')
   
 voltages = np.array([1.06, 1.043, 1.022, 1.013, 1.01, 1.012, 1.003, 1.01, 1.051, 1.044, 1.082, 1.057, 1.071, 1.042, 1.038, 1.045, 1.039, 1.028, 1.025, 1.029, 1.032, 1.033, 1.027, 1.022, 1.019, 1.001, 1.026, 1.011, 1.006, 0.995])
 angles = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.115, -14.434, -16.024, -14.434, -15.302, -15.302, -16.191, -16.278, -15.88, -16.188, -16.884, -17.052, -16.852, -16.468, -16.455, -16.662, -16.83, -16.424, -16.842, -15.912, -12.057, -17.136, -18.015])
@@ -133,16 +123,9 @@ angles = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.1
 np.set_printoptions(precision=3)
 jacobian = JacobianCalculator(list(measurementDict.values()), hDataDict, Ybus, hValues, gridTopology, busConfiguration)
 
-[PA, QA] = JacobianCalculatorV2(Ybus, voltages, angles)
+jacobianV2 = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
 
-print(jacobian[0:29,0:29])
-print(jacobian.shape)
-
-print('---------------------barreira--------------------')
-print(PA)
-print('---------------------barreira--------------------')
-print(QA)
-
-
-
-
+for i in range(jacobian.shape[0]):
+    for j in range(jacobian.shape[1]):
+        if jacobian[i,j] != jacobianV2[i,j]:
+            print(f'valores diferentes em {i}x{j}: Jacobian - {jacobian[i,j]}, JacobianV2 - {jacobianV2[i,j]}')
