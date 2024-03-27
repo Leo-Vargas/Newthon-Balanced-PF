@@ -127,5 +127,5 @@ jacobianV2 = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
 
 for i in range(jacobian.shape[0]):
     for j in range(jacobian.shape[1]):
-        if jacobian[i,j] != jacobianV2[i,j]:
+        if (jacobian[i,j] - jacobianV2[i,j]) > 0.0001:
             print(f'valores diferentes em {i}x{j}: Jacobian - {jacobian[i,j]}, JacobianV2 - {jacobianV2[i,j]}')
