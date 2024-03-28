@@ -138,8 +138,17 @@ anglesEnd = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -1
 #[hValues, hDataDict] = hSetup(gridTopology, angles, voltages)
 
 # --------------- Calculations ---------------
-#np.set_printoptions(precision=3)
+
 #jacobian = JacobianCalculator(list(measurementDict.values()), hDataDict, Ybus, hValues, gridTopology, busConfiguration)
+
+
+iterations = 0
+
+while (any(abs(deltaState) > stopCondition for deltaState in deltaStates)) and (maxIter < iterations):
+    
+
+
+
 
 #jacobianV2 = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
 
