@@ -1,122 +1,93 @@
 import numpy as np
-from scipy import linalg
-import math
-from classes import Measurement, StateData, busTypes
 
+def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.ndarray, busTypes: dict):
+    fasorVoltages = np.zeros(len(voltages), dtype ='complex_')
 
-# ----------------------- Data Processing Related Functions -----------------------------
-def hSetup(gridTopology: dict, angle, voltage):
-    hValues = np.ones(((len(gridTopology)*2)), dtype=float)
-    hDataDict = {}
+    for i in range(len(voltages)):
+        fasorVoltages[i] = module2Complex(voltages[i], angles[i])
+
     
-    for i in range((len(gridTopology)*2)):
-        if i < len(gridTopology):
-            hValues[i]=angle[i]*math.pi/180
-            hDataDict.update({'a'+str(gridTopology[i]): StateData(0, i, gridTopology[i])})
+
+    IcDiag = np.diag(Ybus@fasorVoltages)
+    complexAnglesDiag = np.diag(fasorVoltages/voltages)
+    fasorVoltagesDiag = np.diag(fasorVoltages)
+
+    
+    angleDerivative = 1.j*fasorVoltagesDiag@(np.conj(IcDiag-Ybus@fasorVoltagesDiag))
+
+    voltageDerivative = np.conj(IcDiag)@complexAnglesDiag + fasorVoltagesDiag@np.conj(Ybus@complexAnglesDiag)
+
+    
+    J11 = np.real(np.delete(np.delete(angleDerivative, busTypes['SLACK'] - 1, axis=0),
+                            busTypes['SLACK'] - 1, axis=1))
+    
+    J21 = np.imag(np.delete(np.delete(angleDerivative, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=0),
+                            busTypes['SLACK'] - 1, axis=1))
+    
+    J12 = np.real(np.delete(np.delete(voltageDerivative, busTypes['SLACK'] - 1, axis=0), 
+                            np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=1))
+
+    J22 = np.imag(np.delete(np.delete(voltageDerivative,  np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=0), 
+                            np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=1))
+
+    jacobian = np.concatenate((np.concatenate((J11, J21), axis=0),np.concatenate((J12, J22), axis=0)), axis=1)
+
+#    print(f'J11 shape: {J11.shape}')
+#    print(f'J21 shape: {J21.shape}')
+#    print(f'J12 shape: {J12.shape}')
+#    print(f'J22 shape: {J22.shape}')
+#    print(f'Jacobian shape: {jacobian.shape}')
+    
+#    print(J11)
+#    print(J12)
+
+
+    return jacobian 
+
+
+
+def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
+    fasorVoltages = np.zeros(len(voltages), dtype ='complex_')
+    calculatedS = np.zeros(angles.shape[0], dtype='complex_')
+
+    for i in range(len(voltages)):
+        fasorVoltages[i] = module2Complex(voltages[i], angles[i])
+
+    calculatedS = fasorVoltages*(np.conj(Ybus@fasorVoltages))
+
+
+    calculatedP = np.real(np.delete(calculatedS, busTypes['SLACK'] - 1))
+    calculatedQ = np.imag(np.delete(calculatedS,  np.concatenate((busTypes['SLACK'], busTypes['PV']), axis=None) - 1))
+    #print(f'active power = {calculatedP}')
+    #print(f'reactive power = {calculatedQ}')
+
+    calculatedPQ = np.concatenate((calculatedP, calculatedQ), None)
+
+    return calculatedPQ 
+
+
+def module2Complex(module, angle):
+    """receive a module and angle (IN DREGREES) and returns the complete fasor"""
+    return module*np.exp(1.j*angle*np.pi/180)
+
+
+def updateAVvalues(iterationAVvector: np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
+
+    angleMismatch = 0
+    voltageMismatch = 0
+    voltageShift = angles.shape[0]-busTypes['SLACK']
+    
+    for i in range(angles.shape[0]):
+        if (all((slackBus - 1) != i for slackBus in busTypes['SLACK'])):
+            angles[i] = iterationAVvector[i-angleMismatch]*180/np.pi
+            
+            if (all((PVbus - 1) != i for PVbus in busTypes['PV'])):
+                voltages[i] = iterationAVvector[i+voltageShift-voltageMismatch]
+            else:
+                voltageMismatch+=1
         else:
-            hValues[i]=voltage[i-(len(gridTopology))]
-            hDataDict.update({'v'+str(gridTopology[i-(len(gridTopology))]): StateData(1, i, gridTopology[i-(len(gridTopology))])})
+            angleMismatch+=1
+            voltageMismatch+=1
 
-    hDataDictUpdate(hValues, hDataDict)
+    return [angles, voltages]
 
-    return [hValues, hDataDict]
-
-def hDataDictUpdate(hvalues: np.ndarray, hDataDict: dict):
-   
-    for i, (key, hData) in enumerate(hDataDict.items()):
-        hData.addValue(hvalues[i])
-        
-
-
-def is_symmetric(a, rtol=1e-05, atol=1e-08):
-    if np.allclose(a, a.T, rtol=rtol, atol=atol) == True:
-        print('ok')
-    else:
-        print('not ok')
-
-def checkEquality(a, b, rtol=1e-05, atol=1e-08):
-    if np.allclose(a, b, rtol=rtol, atol=atol) == True:
-        print('ok')
-    else:
-        print('not ok')
-
-def checkSensitivity(reducedJacobian: np.ndarray):
-    sensitivity = np.diag(linalg.inv(reducedJacobian))
-    
-    for i in range(len(sensitivity)):
-        print(sensitivity[i])
-
-# ---------------------- YBUS --------------------
-def makeYbus(linedata: np.ndarray):
-    nl = np.array(linedata[:, 0], dtype=int)
-    nr = np.array(linedata[:, 1], dtype=int)
-    R = np.array(linedata[:, 2], dtype=complex)
-    X = np.array(linedata[:, 3], dtype=complex)
-    Bc = np.array(1j*linedata[:, 4], dtype=complex)
-    a = np.array(linedata[:, 5])
-
-    nbr = len(nl)
-    nbus = np.max([np.max(nl), np.max(nr)])
-    Z = R + X*1j
-
-    y = np.divide(np.ones(nbr), Z)
-
-    Ybus=np.zeros((int(nbus), int(nbus)), dtype=complex)
-
-    for i in range(nbr):
-        if a[i] <= 0:
-            a[i] = 1
-        
-        nl[i]-=1
-        nr[i]-=1
-
-        Ybus[nl[i], nr[i]] = Ybus[nl[i], nr[i]] - y[i]/a[i]
-        Ybus[nr[i], nl[i]] = Ybus[nl[i], nr[i]]
-
-    for n in range(nbus):
-        for k in range(nbr):
-            if nl[k] == n:
-                Ybus[n, n] = Ybus[n, n]+y[k]/(a[k]**2) + Bc[k]
-            elif nr[k] == n:
-                Ybus[n, n] = Ybus[n, n] + y[k] + Bc[k]
-
-    return Ybus
-
-def makeBusConfiguration(measurementDict: dict):
-    busConfiguration = {
-        'slack': busTypes(),
-        'PV': busTypes(),
-        'PQ': busTypes() 
-    }
-    
-    for measurement in measurementDict.values():
-        if measurement.category == 0:
-            if measurement.busType == 0:
-                busConfiguration['slack'].addBus(measurement.bus)
-            elif measurement.busType == 1:
-                busConfiguration['PV'].addBus(measurement.bus)
-            elif measurement.busType == 2:
-                busConfiguration['PQ'].addBus(measurement.bus)
-        else:
-            return busConfiguration
-        
-
-
-# ------------------------ PARTICIPATION ---------------
-def calcBusParticipation(rightEvectors, leftEvectors):
-    busParticipation = np.zeros((np.shape(rightEvectors)[0], np.shape(rightEvectors)[1]))
-
-    for i in range(np.shape(rightEvectors)[0]):
-        for j in range(np.shape(rightEvectors)[1]):
-            busParticipation[i,j] = rightEvectors[i,j]*leftEvectors[j,i]
-    
-    return busParticipation
-
-
-def printBusParticipation(busParticipation):
-
-    for i in range(np.shape(busParticipation)[0]):
-        print('')
-        print(f'Modo {i+1}:', end=' ')
-        for j in range(np.shape(busParticipation)[1]):
-            print(f'{busParticipation[j,i]}', end=' ')

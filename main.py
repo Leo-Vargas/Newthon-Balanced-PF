@@ -1,84 +1,18 @@
 import numpy as np
-from scipy import linalg
-from classes import Measurement, StateData
-from functions import hSetup, makeBusConfiguration
-from JacobianCalculator import JacobianCalculator, ReducedJacobian
-from JacobianCalculatorV2 import JacobianCalculatorV2
+from functions import updateAVvalues, JacobianCalculatorV2, calculatePQ
+
 
 # ----------------------- CONFIG ---------------------------
 np.set_printoptions(precision=3)
-stopCondition = 0.001
-maxIter = 100
+stopCondition = 0.0001
+maxIter = 5
 baseMVA = 100
 
 
 
 
 
-# ----------------------- entry data -----------------------
-measurementDict = {
-    'P1': Measurement(0, 1, 0),
-    'p2': Measurement(0, 2, 1),
-    'p3': Measurement(0, 3, 2),
-    'p4': Measurement(0, 4, 2),
-    'p5': Measurement(0, 5, 1),
-    'p6': Measurement(0, 6, 2),
-    'p7': Measurement(0, 7, 2),
-    'p8': Measurement(0, 8, 1),
-    'p9': Measurement(0, 9, 2),
-    'p10': Measurement(0, 10, 2),
-    'p11': Measurement(0, 11, 1),
-    'p12': Measurement(0, 12, 2),
-    'p13': Measurement(0, 13, 1),
-    'p14': Measurement(0, 14, 2),
-    'p15': Measurement(0, 15, 2),
-    'p16': Measurement(0, 16, 2),
-    'p17': Measurement(0, 17, 2),
-    'p18': Measurement(0, 18, 2),
-    'p19': Measurement(0, 19, 2),
-    'p20': Measurement(0, 20, 2),
-    'p21': Measurement(0, 21, 2),
-    'p22': Measurement(0, 22, 2),
-    'p23': Measurement(0, 23, 2),
-    'p24': Measurement(0, 24, 2),
-    'p25': Measurement(0, 25, 2),
-    'p26': Measurement(0, 26, 2),
-    'p27': Measurement(0, 27, 2),
-    'p28': Measurement(0, 28, 2),
-    'p29': Measurement(0, 29, 2),
-    'p30': Measurement(0, 30, 2),
-    'q1': Measurement(1, 1, 0),
-    'q2': Measurement(1, 2, 1),
-    'q3': Measurement(1, 3, 2),
-    'q4': Measurement(1, 4, 2),
-    'q5': Measurement(1, 5, 1),
-    'q6': Measurement(1, 6, 2),
-    'q7': Measurement(1, 7, 2),
-    'q8': Measurement(1, 8, 1),
-    'q9': Measurement(1, 9, 2),
-    'q10': Measurement(1, 10, 2),
-    'q11': Measurement(1, 11, 1),
-    'q12': Measurement(1, 12, 2),
-    'q13': Measurement(1, 13, 1),
-    'q14': Measurement(1, 14, 2),
-    'q15': Measurement(1, 15, 2),
-    'q16': Measurement(1, 16, 2),
-    'q17': Measurement(1, 17, 2),
-    'q18': Measurement(1, 18, 2),
-    'q19': Measurement(1, 19, 2),
-    'q20': Measurement(1, 20, 2),
-    'q21': Measurement(1, 21, 2),
-    'q22': Measurement(1, 22, 2),
-    'q23': Measurement(1, 23, 2),
-    'q24': Measurement(1, 24, 2),
-    'q25': Measurement(1, 25, 2),
-    'q26': Measurement(1, 26, 2),
-    'q27': Measurement(1, 27, 2),
-    'q28': Measurement(1, 28, 2),
-    'q29': Measurement(1, 29, 2),
-    'q30': Measurement(1, 30, 2)
-}    
-gridTopology = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
+# ----------------------- entry data 30 bus-----------------------
 
 Ybus = np.array([
 (6.46838346734966 - 20.6959477620055j, -5.22464617988566 + 15.6467268408034j, -1.24373728746401 + 5.09602092120209j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j, 0.00000000000000 + 0.00000000000000j),
@@ -116,39 +50,100 @@ Ybus = np.array([
 #print('\n')
 #is_symmetric(Ybus)
 
-busConfiguration = makeBusConfiguration(measurementDict)
+
 busTypes = {
     'SLACK': np.array([1, ]),
     'PV': np.array([2, 5, 8, 11, 13]),
     'PQ': np.array([3, 4, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
 }
 
-voltages = np.array([1.06, 1.043, 1.0, 1.06, 1.01, 1.0, 1.0, 1.01, 1.0, 1.0, 1.082, 1.0, 1.071, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
-angles = np.zeros(30, dtype=float)
+voltages = np.array([1.06, 1.043, 1.0, 1.0, 1.01, 1.0, 1.0, 1.01, 1.0, 1.0, 1.082, 1.0, 1.071, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+angles = np.zeros(voltages.shape[0], dtype=float)
 
-loadsMW = np.array([0.0, 21.7, 2.4, 7.6, 94.2, 0.0, 22.8, 30.0, 0.0, 5.8, 0.0, 11.2, 0.0, 6.2, 8.2, 3.5, 9.0, 3.2, 9.5, 2.2, 17.5, 0.0, 3.2, 8.7, 0.0, 3.5, 0.0, 0.0, 2.4, 10.6])
+loadsMw = np.array([0.0, 21.7, 2.4, 7.6, 94.2, 0.0, 22.8, 30.0, 0.0, 5.8, 0.0, 11.2, 0.0, 6.2, 8.2, 3.5, 9.0, 3.2, 9.5, 2.2, 17.5, 0.0, 3.2, 8.7, 0.0, 3.5, 0.0, 0.0, 2.4, 10.6])
 loadsMvar = np.array([0.0, 12.7, 1.2, 1.6, 19.0, 0.0, 10.9, 30.0, 0.0, 2.0, 0.0, 7.5, 0.0, 1.6, 2.5, 1.8, 5.8, 0.9, 3.4, 0.7, 11.2, 0.0, 1.6, 6.7, 0.0, 2.3, 0.0, 0.0, 0.9, 1.9])
 
-generationMW = np.array([0.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-generationMvar = np.zeros(30, dtype=float)
+generationMw = np.array([0.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+generationMvar = np.zeros(generationMw.shape[0], dtype=float)
 
 voltagesEnd = np.array([1.06, 1.043, 1.022, 1.013, 1.01, 1.012, 1.003, 1.01, 1.051, 1.044, 1.082, 1.057, 1.071, 1.042, 1.038, 1.045, 1.039, 1.028, 1.025, 1.029, 1.032, 1.033, 1.027, 1.022, 1.019, 1.001, 1.026, 1.011, 1.006, 0.995])
 anglesEnd = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.115, -14.434, -16.024, -14.434, -15.302, -15.302, -16.191, -16.278, -15.88, -16.188, -16.884, -17.052, -16.852, -16.468, -16.455, -16.662, -16.83, -16.424, -16.842, -15.912, -12.057, -17.136, -18.015])
 
-#[hValues, hDataDict] = hSetup(gridTopology, angles, voltages)
+
+
+# ---------------------- entry data 3 bus ----------------
+"""
+Ybus = np.array([
+    (20.0-50.0j, -10.0+20.0j, -10.0+30.0j),
+    (-10.0+20.0j, 26.0-52.0j, -16.0+32.0j),
+    (-10.0+30.0j, -16.0+32.0j, 26.0-62.0j)
+])
+
+busTypes = {
+    'SLACK': np.array([1, ]),
+    'PV': np.array([3, ]),
+    'PQ': np.array([2, ]),
+}
+
+voltages = np.array([1.05, 1.0, 1.04])
+angles = np.zeros(voltages.shape[0], dtype=float)
+
+loadsMw = np.array([0.0, 400.0, 0.0])
+loadsMvar = np.array([0.0, 250.0, 0.0])
+
+generationMw = np.array([0.0, 0.0, 200.0])
+generationMvar = np.array([0.0, 0.0, 0.0])
+
+"""
 
 # --------------- Calculations ---------------
 
-#jacobian = JacobianCalculator(list(measurementDict.values()), hDataDict, Ybus, hValues, gridTopology, busConfiguration)
+
 
 
 iterations = 0
 
-while (any(abs(deltaState) > stopCondition for deltaState in deltaStates)) and (maxIter < iterations):
+iterationAvector = np.zeros(angles.shape[0]-busTypes['SLACK'].shape[0], dtype=float)
+iterationVvector = np.ones(voltages.shape[0]-busTypes['SLACK'].shape[0]-busTypes['PV'].shape[0], dtype=float)
+
+scheduledPvector = np.delete((generationMw - loadsMw)/baseMVA, busTypes['SLACK'] - 1)
+scheduledQvector = np.delete((generationMvar - loadsMvar)/baseMVA, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1)
+
+scheduledPQvector = np.concatenate((scheduledPvector, scheduledQvector), None)
+
+iterationAVvector = np.concatenate((iterationAvector, iterationVvector), None)
+deltaAVvector = np.zeros(iterationAVvector.shape[0])
+calculatedPQvector = calculatePQ(Ybus, angles, voltages, busTypes)
+
+print(iterationAVvector)
+
+deltaPQvector = scheduledPQvector - calculatedPQvector
+
+
+
+while (any(abs(deltaPQ) > stopCondition for deltaPQ in deltaPQvector)) and (maxIter > iterations):
+    iterations+=1
+    print(f'iteration {iterations}')
+
+    jacobian = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
+
+    deltaAVvector = np.linalg.solve(jacobian, deltaPQvector)
+
+    iterationAVvector = iterationAVvector + deltaAVvector
+
+    [angles, voltages] = updateAVvalues(iterationAVvector, angles, voltages, busTypes)
     
+    calculatedPQvector = calculatePQ(Ybus, angles, voltages, busTypes)
+    deltaPQvector = scheduledPQvector - calculatedPQvector
 
+    print(f'jacobian shape = {jacobian.shape}')
+    print(jacobian)
+    print(f'deltaAVvector = {deltaAVvector}')
+    print(f'iterationAVvector = {iterationAVvector}')
+    print(f'voltages = {voltages}')
+    print(f'angles = {angles}')
+    print(f'delta PQ = {deltaPQvector}')
+    print('-------------------------------------------')
+    print('')
 
-
-
-#jacobianV2 = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
 
