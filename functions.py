@@ -45,7 +45,6 @@ def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.nda
     return jacobian 
 
 
-
 def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
     fasorVoltages = np.zeros(len(voltages), dtype ='complex_')
     calculatedS = np.zeros(angles.shape[0], dtype='complex_')
@@ -91,3 +90,49 @@ def updateAVvalues(iterationAVvector: np.ndarray, angles: np.ndarray, voltages: 
 
     return [angles, voltages]
 
+
+def readYbus(filePath: str):
+    data = []
+    with open(filePath, 'r') as file:
+        # Skip the first line
+        next(file)
+        for line in file:
+            # Split the line by spaces and remove any leading/trailing whitespaces
+            lineData = line.strip().split()
+            # Append the data to the list
+            data.append(lineData)
+
+    #print(data)
+
+    nl = np.array([int(row[0]) for row in data])
+    nr = np.array([int(row[1]) for row in data])
+    R = np.array([float(row[6]) for row in data])
+    X = np.array([float(row[7]) for row in data])
+    Bc = np.array([float(row[8]) for row in data])
+    #a = np.array([float(row[9]) for row in data])
+
+    #print(nl)
+    #print(nr)
+    #print(R)
+    #print(X)
+    #print(Bc)
+
+    nbr = nl.shape[0]
+    nbus = int(np.max([np.max(nl), np.max(nr)]))
+    Z = R + 1j*X
+    y = np.ones(nbr)/Z
+
+    Ybus = np.zeros((nbus, nbus), dtype='complex_')
+
+        #formation of the off diagonal elements
+    for i in range(nbr):
+        Ybus[nl[i] - 1, nr[i] - 1] = -y[i]
+        Ybus[nr[i] - 1, nl[i] - 1] = Ybus[nl[i] - 1, nr[i] - 1]
+
+    for  n in range(nbus):
+        for k in range(nbr):
+            if (nl[k] == n) or (nr[k] == n):
+                Ybus[n,n] = Ybus[n,n] + y[k] + 1j*Bc[k]
+
+
+    return Ybus
