@@ -1,5 +1,5 @@
 import numpy as np
-from functions import updateAVvalues, JacobianCalculatorV2, calculatePQ, readYbus
+from functions import updateAVvalues, JacobianCalculatorV2, calculatePQ, cutSlack, cutSlackPV
 from cases import IEEE30bus, Saadat3Bus, IEEE14Bus, GhendyCase
 
 # ----------------------- CONFIG ---------------------------
@@ -24,11 +24,14 @@ print('---------------------------')
 
 iterations = 0
 
-iterationAvector = np.zeros(angles.shape[0]-busTypes['SLACK'].shape[0], dtype=float)
-iterationVvector = np.ones(voltages.shape[0]-busTypes['SLACK'].shape[0]-busTypes['PV'].shape[0], dtype=float)
+iterationAvector = np.zeros(angles.shape[0], dtype=float)
+iterationVvector = np.ones(voltages.shape[0], dtype=float)
 
-scheduledPvector = np.delete((generationMw - loadsMw)/baseMVA, busTypes['SLACK'] - 1)
-scheduledQvector = np.delete((generationMvar - loadsMvar)/baseMVA, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1)
+iterationAvector = cutSlack(iterationAvector, busTypes)
+iterationVvector = cutSlackPV(iterationVvector, busTypes)
+
+scheduledPvector = cutSlack((generationMw - loadsMw)/baseMVA, busTypes)
+scheduledQvector = cutSlackPV((generationMvar - loadsMvar)/baseMVA, busTypes)
 
 scheduledPQvector = np.concatenate((scheduledPvector, scheduledQvector), None)
 

@@ -14,17 +14,17 @@ def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.nda
     voltageDerivative = np.conj(IcDiag)@complexAnglesDiag + fasorVoltagesDiag@np.conj(Ybus@complexAnglesDiag)
 
     
-    J11 = np.real(np.delete(np.delete(angleDerivative, busTypes['SLACK'] - 1, axis=0),
-                            busTypes['SLACK'] - 1, axis=1))
+    J11 = np.real(cutSlack(cutSlack(angleDerivative, busTypes, axis=0),
+                            busTypes, axis=1))
     
-    J21 = np.imag(np.delete(np.delete(angleDerivative, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=0),
-                            busTypes['SLACK'] - 1, axis=1))
+    J21 = np.imag(cutSlack(cutSlackPV(angleDerivative, busTypes, axis=0),
+                            busTypes, axis=1))
     
-    J12 = np.real(np.delete(np.delete(voltageDerivative, busTypes['SLACK'] - 1, axis=0), 
-                            np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=1))
+    J12 = np.real(cutSlackPV(cutSlack(voltageDerivative, busTypes, axis=0), 
+                            busTypes, axis=1))
 
-    J22 = np.imag(np.delete(np.delete(voltageDerivative,  np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=0), 
-                            np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis=1))
+    J22 = np.imag(cutSlackPV(cutSlackPV(voltageDerivative, busTypes, axis=0), 
+                            busTypes, axis=1))
 
     jacobian = np.concatenate((np.concatenate((J11, J21), axis=0),np.concatenate((J12, J22), axis=0)), axis=1)
 
@@ -48,8 +48,8 @@ def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTy
     calculatedS = fasorVoltages*(np.conj(Ybus@fasorVoltages))
 
 
-    calculatedP = np.real(np.delete(calculatedS, busTypes['SLACK'] - 1))
-    calculatedQ = np.imag(np.delete(calculatedS,  np.concatenate((busTypes['SLACK'], busTypes['PV']), axis=None) - 1))
+    calculatedP = np.real(cutSlack(calculatedS, busTypes))
+    calculatedQ = np.imag(cutSlackPV(calculatedS, busTypes))
     #print(f'active power = {calculatedP}')
     #print(f'reactive power = {calculatedQ}')
 
@@ -125,3 +125,12 @@ def readYbus(filePath: str):
 
 
     return Ybus
+
+
+def cutSlack(array: np.ndarray, busTypes: dict, axis=None):
+    return np.delete(array, busTypes['SLACK']-1, axis)
+
+def cutSlackPV(array: np.ndarray, busTypes: dict, axis=None):
+    if busTypes['PV'].size == 0:
+        return np.delete(array, busTypes['SLACK']-1, axis)
+    return np.delete(array, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1)
