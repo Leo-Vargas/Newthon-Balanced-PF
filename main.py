@@ -1,10 +1,10 @@
 import numpy as np
 from functions import updateAVvalues, JacobianCalculatorV2, calculatePQ, readYbus
-from cases import IEEE30bus, Saadat3Bus, IEEE14Bus
+from cases import IEEE30bus, Saadat3Bus, IEEE14Bus, GhendyCase
 
 # ----------------------- CONFIG ---------------------------
 np.set_printoptions(precision=3)
-stopCondition = 0.0001
+stopCondition = 0.001
 maxIter = 10
 baseMVA = 100
 
@@ -12,7 +12,7 @@ baseMVA = 100
 # ------------- Load case Data -----------------
 
 
-[Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar] = IEEE14Bus()
+[Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar] = GhendyCase()
 print(Ybus)
 print('---------------------------')
 

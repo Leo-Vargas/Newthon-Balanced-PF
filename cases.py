@@ -51,6 +51,7 @@ def Saadat3Bus():
 
     return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
 
+
 def IEEE14Bus():
     Ybus = readYbus(IEEE14BusPath)
 
@@ -71,3 +72,28 @@ def IEEE14Bus():
 
     return [Ybus, busTypes, voltages, angles, loadsMw, loadsMVar, generationMw, generationMvar]
 
+
+def GhendyCase():
+    Ybus = np.array([
+        (0.0236+1j*0.0233, -0.0236-1j*0.0233, 0, 0),
+        (-0.0236-1j*0.0233, 0.0239+1j*0.0235, -0.0003-1j*0.0002, 0),
+        (0, -0.0003-1j*0.0002, 0.0054+1j*0.0007, -0.0051-1j*0.0005),
+        (0, 0, -0.0051-1j*0.0005, 0.0051+1j*0.0005)
+    ])
+
+    busTypes = {
+        'SLACK': np.array([1, ]),
+        'PV': np.array([]),
+        'PQ': np.array([2, 3, 4])
+    }
+
+    voltages = np.array([1.05, 1.0, 1.0, 1.0])
+    angles = np.array([0.0, 0.0, 0.0, 0.0])
+
+    loadsMw = np.array([0.0, 1.28, 0.32, 1.6])*100
+    loadsMvar = np.array([0.0, 1.28, 0.16, 0.8])*100
+
+    genereationMw = np.array([0.0, 0.0, 0.0, 0.0])
+    generationMvar = np.array([0.0, 0.0, 0.0, 0.0])
+
+    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, genereationMw, generationMvar]
