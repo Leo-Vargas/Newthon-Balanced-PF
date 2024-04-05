@@ -1,12 +1,8 @@
 import numpy as np
 
 def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.ndarray, busTypes: dict):
-    fasorVoltages = np.zeros(len(voltages), dtype ='complex_')
 
-    for i in range(len(voltages)):
-        fasorVoltages[i] = module2Complex(voltages[i], angles[i])
-
-    
+    fasorVoltages = voltages*np.exp(1.j*angles*np.pi/180)    
 
     IcDiag = np.diag(Ybus@fasorVoltages)
     complexAnglesDiag = np.diag(fasorVoltages/voltages)
@@ -46,11 +42,8 @@ def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.nda
 
 
 def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
-    fasorVoltages = np.zeros(len(voltages), dtype ='complex_')
-    calculatedS = np.zeros(angles.shape[0], dtype='complex_')
 
-    for i in range(len(voltages)):
-        fasorVoltages[i] = module2Complex(voltages[i], angles[i])
+    fasorVoltages = voltages*np.exp(1.j*angles*np.pi/180)
 
     calculatedS = fasorVoltages*(np.conj(Ybus@fasorVoltages))
 
@@ -64,10 +57,6 @@ def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTy
 
     return calculatedPQ 
 
-
-def module2Complex(module, angle):
-    """receive a module and angle (IN DREGREES) and returns the complete fasor"""
-    return module*np.exp(1.j*angle*np.pi/180)
 
 
 def updateAVvalues(iterationAVvector: np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
