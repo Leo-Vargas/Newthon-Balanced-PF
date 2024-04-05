@@ -1,11 +1,11 @@
 import numpy as np
 from functions import updateAVvalues, JacobianCalculatorV2, calculatePQ, readYbus
-
+from filePath import FILEPATH
 
 # ----------------------- CONFIG ---------------------------
 np.set_printoptions(precision=3)
 stopCondition = 0.0001
-maxIter = 1
+maxIter = 10
 baseMVA = 100
 
 
@@ -50,9 +50,9 @@ Ybust = np.array([
 #print('\n')
 #is_symmetric(Ybus)
 
-Ybus= readYbus(r'C:\Users\Leonardo\Documents\Mestrado\Pesquisa\Newthon-Balanced-PF\ieee30cdf.txt')
+Ybus= readYbus(FILEPATH)
 
-#print(YbusV2)
+print(Ybus)
 
 
 busTypes = {
