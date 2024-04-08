@@ -12,14 +12,12 @@ baseMVA = 100
 # ------------- Load case Data -----------------
 
 
-[Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar] = GhendyCase()
+[Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar] = IEEE14Bus()
 print(Ybus)
 print('---------------------------')
 
 
 # --------------- Calculations ---------------
-
-
 
 
 iterations = 0
