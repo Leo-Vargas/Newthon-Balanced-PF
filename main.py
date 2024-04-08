@@ -62,7 +62,7 @@ while (any(abs(deltaPQ) > stopCondition for deltaPQ in deltaPQvector)) and (maxI
     deltaPQvector = scheduledPQvector - calculatedPQvector
 
     print(jacobian)
-    for i in range(deltaPQvector.shape[0]):
+    for i in range(deltaAVvector.shape[0]):
         print(f'DeltaAV{i} = {deltaAVvector[i]}; iterationAV{i} = {iterationAVvector[i]}')
 
     for i in range(deltaPQvector.shape[0]):

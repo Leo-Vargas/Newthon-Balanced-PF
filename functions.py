@@ -133,4 +133,4 @@ def cutSlack(array: np.ndarray, busTypes: dict, axis=None):
 def cutSlackPV(array: np.ndarray, busTypes: dict, axis=None):
     if busTypes['PV'].size == 0:
         return np.delete(array, busTypes['SLACK']-1, axis)
-    return np.delete(array, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1)
+    return np.delete(array, np.concatenate((busTypes['SLACK'], busTypes['PV']), None) - 1, axis)
