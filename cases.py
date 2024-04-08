@@ -2,7 +2,7 @@ import numpy as np
 from functions import readYbus
 from filePath import IEEE30BusPath, IEEE14BusPath
 
-def IEEE30bus():
+def IEEE30Bus():
     Ybus = readYbus(IEEE30BusPath)
 
     busTypes = {

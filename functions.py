@@ -98,7 +98,7 @@ def readYbus(filePath: str):
     R = np.array([float(row[6]) for row in data])
     X = np.array([float(row[7]) for row in data])
     Bc = np.array([float(row[8]) for row in data])
-    #a = np.array([float(row[9]) for row in data])
+    a = np.array([float(row[14]) for row in data])
 
     #print(nl)
     #print(nr)
@@ -111,18 +111,22 @@ def readYbus(filePath: str):
     Z = R + 1j*X
     y = np.ones(nbr)/Z
 
+
     Ybus = np.zeros((nbus + 1, nbus + 1), dtype='complex_')
 
         #formation of the off diagonal elements
     for i in range(nbr):
-        Ybus[nl[i], nr[i]] = Ybus[nl[i], nr[i]] - y[i]
+        if a[i] <= 0:
+            a[i] = 1.0
+        Ybus[nl[i], nr[i]] = Ybus[nl[i], nr[i]] - y[i]/a[i]
         Ybus[nr[i], nl[i]] = Ybus[nl[i], nr[i]]
 
     for  n in range(nbus):
         for k in range(nbr):
-            if (nl[k] == n) or (nr[k] == n):
+            if (nl[k] == n):
+                Ybus[n,n] = Ybus[n,n] + y[k]/(a[k]**2) + 1j*Bc[k]
+            elif nr[k] == n:
                 Ybus[n,n] = Ybus[n,n] + y[k] + 1j*Bc[k]
-
 
     return Ybus
 
