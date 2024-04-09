@@ -45,6 +45,7 @@ def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTy
 
     fasorVoltages = voltages*np.exp(1.j*angles*np.pi/180)
 
+    print(Ybus@fasorVoltages)
     calculatedS = fasorVoltages*(np.conj(Ybus@fasorVoltages))
 
 
@@ -60,7 +61,6 @@ def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTy
 
 
 def updateAVvalues(iterationAVvector: np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTypes: dict):
-
     angleMismatch = 0
     voltageMismatch = 0
     voltageShift = angles.shape[0]-busTypes['SLACK']
@@ -107,12 +107,12 @@ def readYbus(filePath: str):
     #print(Bc)
 
     nbr = nl.shape[0]
-    nbus = int(np.max([np.max(nl), np.max(nr)]))
+    nbus = int(np.max([np.max(nl), np.max(nr)]) + 1)
     Z = R + 1j*X
     y = np.ones(nbr)/Z
 
 
-    Ybus = np.zeros((nbus + 1, nbus + 1), dtype='complex_')
+    Ybus = np.zeros((nbus, nbus), dtype='complex_')
 
         #formation of the off diagonal elements
     for i in range(nbr):
