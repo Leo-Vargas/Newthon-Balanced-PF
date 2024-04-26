@@ -1,5 +1,17 @@
 import numpy as np
 
+
+def openSwitch(switch: np.ndarray, Ybus):
+    x = 1
+    for i in range(switch.shape[0]):
+        if switch[i] != 0:
+            x = 0
+
+    return x
+
+
+
+
 def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.ndarray, busTypes: dict):
 
     fasorVoltages = voltages*np.exp(1.j*angles*np.pi/180)    

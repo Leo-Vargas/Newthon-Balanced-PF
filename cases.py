@@ -98,7 +98,7 @@ def IEEE14Bus():
     return [Ybus, busTypes, voltages, angles, loadsMw, loadsMVar, generationMw, generationMvar]
 
 
-def GhendyCase():
+def Ghendy4Bus():
     Ybus = np.array([
         (21.457-21.185j, -21.457+21.185j, 0, 0),
         (-21.457+21.185j, 2328.149779016-1559.646245j, -2306.69231+1538.461538j, 0),
@@ -118,7 +118,34 @@ def GhendyCase():
     loadsMw = np.array([0.0, 1.28, 0.32, 1.6])*100
     loadsMvar = np.array([0.0, 1.28, 0.16, 0.8])*100
 
-    genereationMw = np.array([0.0, 0.0, 0.0, 0.0])
+    generationMw = np.array([0.0, 0.0, 0.0, 0.0])
     generationMvar = np.array([0.0, 0.0, 0.0, 0.0])
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, genereationMw, generationMvar]
+    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+
+
+def Switch4Bus(switch: int = 0):
+
+    Ybus = np.array([
+        (1/(0.0236+0.0233j)+0.001j, -1/(0.0236+0.0233j), 0, 0),
+        (-1/(0.0236+0.0233j), 1/(0.0236+0.0233j) + 1/(0.045+0.030j) + 1/(0.0051+0.005j) + 0.003j, -1/(0.045+0.030j), -1/(0.0051+0.005j)),
+        (0, -1/(0.045+0.030j), 1/(0.045+0.030j) + 0.001j, 0),
+        (0, 0, -1/(0.0051+0.005j), 1/(0.0051+0.005j) + 0.001j),
+    ])
+
+    busTypes = {
+        'SLACK': np.array([1, ]),
+        'PV': np.array([]),
+        'PQ': np.array([2, 3, 4])
+    }
+
+    voltages = np.array([1.03, 1.0, 1.0, 1.0])
+    angles = np.zeros(voltages.shape[0])
+
+    loadsMw = np.array([0.0, 1.28, 0.32, 1.6])*100
+    loadsMvar = np.array([0.0, 1.28, 0.16, 0.8])*100
+
+    generationMw = np.zeros(voltages.shape[0])
+    generationMvar = np.zeros(voltages.shape[0])
+
+    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
