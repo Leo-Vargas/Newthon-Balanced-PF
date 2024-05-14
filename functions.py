@@ -1,13 +1,22 @@
 import numpy as np
 
 
-def openSwitch(switch: np.ndarray, Ybus):
-    x = 1
-    for i in range(switch.shape[0]):
-        if switch[i] != 0:
-            x = 0
+def openSwitch(switches: np.ndarray, switchData: dict, Ybus: np.ndarray, busTypes: dict, voltages: np.ndarray, angles: np.ndarray, loadsMw: np.ndarray, loadsMvar: np.ndarray, generationMw: np.ndarray, generationMvar: np.ndarray):
 
-    return x
+    switchesSorted = np.sort(switches)[::-1]
+
+    for switch in switches:
+        if switch % 2 == 0:
+            generationMw[switchData[switch][1]] = 0.0
+            generationMvar[switchData[switch][1]] = 0.0
+        else:
+            generationMw = np.delete(generationMw, switchData[switch][1])
+            generationMvar = np.delete(generationMvar, switchData[switch[1]])
+
+        
+        
+
+    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
 
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from functions import readYbus
+from functions import readYbus, openSwitch
 from filePath import IEEE30BusPath, IEEE14BusPath
 
 def IEEE30Bus():
@@ -124,7 +124,7 @@ def Ghendy4Bus():
     return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
 
 
-def Switch4Bus(switch: int = 0):
+def Switch4Bus(switches: int = 0):
 
     Ybus = np.array([
         (1/(0.0236+0.0233j)+0.001j, -1/(0.0236+0.0233j), 0, 0),
@@ -139,6 +139,15 @@ def Switch4Bus(switch: int = 0):
         'PQ': np.array([2, 3, 4])
     }
 
+    switchData = {
+        1: np.array([0, 1]),
+        2: np.array([0, 1]),
+        3: np.array([1, 2]),
+        4: np.array([1, 2]),
+        5: np.array([1, 3]),
+        6: np.array([1, 3])
+    }
+
     voltages = np.array([1.03, 1.0, 1.0, 1.0])
     angles = np.zeros(voltages.shape[0])
 
@@ -148,4 +157,7 @@ def Switch4Bus(switch: int = 0):
     generationMw = np.zeros(voltages.shape[0])
     generationMvar = np.zeros(voltages.shape[0])
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+    if any (switch == 0 or switch > 6 for switch in switches):
+        return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+
+    return openSwitch(switches, switchData, Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar)
