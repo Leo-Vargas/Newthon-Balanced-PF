@@ -1,5 +1,5 @@
 import numpy as np
-from functions import readYbus, openSwitch
+from functions import readYbus
 from filePath import IEEE30BusPath, IEEE14BusPath
 
 def IEEE30Bus():
@@ -24,7 +24,22 @@ def IEEE30Bus():
     #anglesEnd = np.array([0.0, -5.497, -8.004, -9.661, -14.381, -11.398, -13.158, -12.115, -14.434, -16.024, -14.434, -15.302, -15.302, -16.191, -16.278, -15.88, -16.188, -16.884, -17.052, -16.852, -16.468, -16.455, -16.662, -16.83, -16.424, -16.842, -15.912, -12.057, -17.136, -18.015])
 
 
-    return [Ybus,  busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+    switchData = {
+    }
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+        'switches': switchData
+    }
+
+    return caseData
 
 
 def Saadat3Bus():
@@ -49,7 +64,22 @@ def Saadat3Bus():
     generationMw = np.array([0.0, 0.0, 200.0])
     generationMvar = np.array([0.0, 0.0, 0.0])
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+    switchData = {
+    }
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+        'switches': switchData
+    }
+
+    return caseData
 
 
 def IEEE14Bus():
@@ -85,7 +115,7 @@ def IEEE14Bus():
     angles = np.zeros(voltages.shape[0], dtype=float)
 
     loadsMw = np.array([0.0, 21.7, 94.2, 47.2, 7.6, 11.2, 0.0, 0.0, 29.5, 9.0, 3.5, 6.1, 13.5, 14.9])
-    loadsMVar = np.array([0.0, 12.7, 19.0, -3.9, 1.6, 7.5, 0.0, 0.0, 16.6, 5.8, 1.8, 1.6, 5.8, 5.0])
+    loadsMvar = np.array([0.0, 12.7, 19.0, -3.9, 1.6, 7.5, 0.0, 0.0, 16.6, 5.8, 1.8, 1.6, 5.8, 5.0])
 
     generationMw = np.array([0.0, 40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     generationMvar = np.array([0.0, 42.4, 23.4, 0.0, 0.0, 12.2, 0.0, 17.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
@@ -95,7 +125,22 @@ def IEEE14Bus():
     print(f'angles shape: {angles.shape[0]}')
 
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMVar, generationMw, generationMvar]
+    switchData = {
+    }
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+        'switches': switchData
+    }
+
+    return caseData
 
 
 def Ghendy4Bus():
@@ -121,16 +166,31 @@ def Ghendy4Bus():
     generationMw = np.array([0.0, 0.0, 0.0, 0.0])
     generationMvar = np.array([0.0, 0.0, 0.0, 0.0])
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+    switchData = {
+    }
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+        'switches': switchData
+    }
+
+    return caseData
 
 
 def Switch4Bus(switches: int = 0):
 
     Ybus = np.array([
-        (1/(0.0236+0.0233j)+0.001j, -1/(0.0236+0.0233j), 0, 0),
-        (-1/(0.0236+0.0233j), 1/(0.0236+0.0233j) + 1/(0.045+0.030j) + 1/(0.0051+0.005j) + 0.003j, -1/(0.045+0.030j), -1/(0.0051+0.005j)),
+        (1/(0.0236+0.0233j)+1/0.001j, -1/(0.0236+0.0233j), 0, 0),
+        (-1/(0.0236+0.0233j), 1/(0.0236+0.0233j) + 1/(0.045+0.030j) + 1/(0.0051+0.0005j) + 0.003j, -1/(0.045+0.030j), -1/(0.0051+0.0005j)),
         (0, -1/(0.045+0.030j), 1/(0.045+0.030j) + 0.001j, 0),
-        (0, 0, -1/(0.0051+0.005j), 1/(0.0051+0.005j) + 0.001j),
+        (0, 0, -1/(0.0051+0.0005j), 1/(0.0051+0.005j) + 0.001j),
     ])
 
     busTypes = {
@@ -148,6 +208,13 @@ def Switch4Bus(switches: int = 0):
         6: np.array([1, 3])
     }
 
+    gridTopology = {
+        0: [1],
+        1: [2, 3],
+        2: [],
+        3: []
+    }
+
     voltages = np.array([1.03, 1.0, 1.0, 1.0])
     angles = np.zeros(voltages.shape[0])
 
@@ -157,7 +224,16 @@ def Switch4Bus(switches: int = 0):
     generationMw = np.zeros(voltages.shape[0])
     generationMvar = np.zeros(voltages.shape[0])
 
-    if any (switch == 0 or switch > 6 for switch in switches):
-        return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+        'switches': switchData
+    }
 
-    return openSwitch(switches, switchData, Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar)
+    return caseData

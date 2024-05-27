@@ -12,8 +12,9 @@ baseMVA = 100
 # ------------- Load case Data -----------------
 
 
-[Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar] = Switch4Bus()
-print(Ybus)
+
+caseData = Switch4Bus()
+print(caseData['Ybus'])
 print('---------------------------')
 
 
@@ -22,20 +23,20 @@ print('---------------------------')
 
 iterations = 0
 
-iterationAvector = np.zeros(angles.shape[0], dtype=float)
-iterationVvector = np.ones(voltages.shape[0], dtype=float)
+iterationAvector = np.zeros(caseData['angles'].shape[0], dtype=float)
+iterationVvector = np.ones(caseData['voltages'].shape[0], dtype=float)
 
-iterationAvector = cutSlack(iterationAvector, busTypes)
-iterationVvector = cutSlackPV(iterationVvector, busTypes)
+iterationAvector = cutSlack(iterationAvector, caseData['busTypes'])
+iterationVvector = cutSlackPV(iterationVvector, caseData['busTypes'])
 
-scheduledPvector = cutSlack((generationMw - loadsMw)/baseMVA, busTypes)
-scheduledQvector = cutSlackPV((generationMvar - loadsMvar)/baseMVA, busTypes)
+scheduledPvector = cutSlack((caseData['generationMw'] - caseData['loadsMw'])/baseMVA, caseData['busTypes'])
+scheduledQvector = cutSlackPV((caseData['generationMvar'] - caseData['loadsMvar'])/baseMVA, caseData['busTypes'])
 
 scheduledPQvector = np.concatenate((scheduledPvector, scheduledQvector), None)
 
 iterationAVvector = np.concatenate((iterationAvector, iterationVvector), None)
 deltaAVvector = np.zeros(iterationAVvector.shape[0])
-calculatedPQvector = calculatePQ(Ybus, angles, voltages, busTypes)
+calculatedPQvector = calculatePQ(caseData['Ybus'], caseData['angles'], caseData['voltages'], caseData['busTypes'])
 
 
 deltaPQvector = scheduledPQvector - calculatedPQvector
@@ -48,15 +49,15 @@ while (any(abs(deltaPQ) > stopCondition for deltaPQ in deltaPQvector)) and (maxI
     iterations+=1
     print(f'iteration {iterations}')
 
-    jacobian = JacobianCalculatorV2(Ybus, voltages, angles, busTypes)
+    jacobian = JacobianCalculatorV2(caseData['Ybus'], caseData['voltages'], caseData['angles'], caseData['busTypes'])
 
     deltaAVvector = np.linalg.solve(jacobian, deltaPQvector)
 
     iterationAVvector = iterationAVvector + deltaAVvector
 
-    [angles, voltages] = updateAVvalues(iterationAVvector, angles, voltages, busTypes)
+    [caseData['angles'], caseData['voltages']] = updateAVvalues(iterationAVvector, caseData['angles'], caseData['voltages'], caseData['busTypes'])
     
-    calculatedPQvector = calculatePQ(Ybus, angles, voltages, busTypes)
+    calculatedPQvector = calculatePQ(caseData['Ybus'], caseData['angles'], caseData['voltages'], caseData['busTypes'])
     deltaPQvector = scheduledPQvector - calculatedPQvector
 
     print(jacobian)
@@ -69,6 +70,6 @@ while (any(abs(deltaPQ) > stopCondition for deltaPQ in deltaPQvector)) and (maxI
 
     print('-------------------------------------------')
     print('')
-print(voltages)
-print(angles)
+print(f'tensões finais = {caseData['voltages']}')
+print(f'angulos finais = {caseData['angles']}')
 

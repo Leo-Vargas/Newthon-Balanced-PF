@@ -1,6 +1,6 @@
 import numpy as np
 
-
+"""
 def openSwitch(switches: np.ndarray, switchData: dict, Ybus: np.ndarray, busTypes: dict, voltages: np.ndarray, angles: np.ndarray, loadsMw: np.ndarray, loadsMvar: np.ndarray, generationMw: np.ndarray, generationMvar: np.ndarray):
 
     switchesSorted = np.sort(switches)[::-1]
@@ -17,8 +17,7 @@ def openSwitch(switches: np.ndarray, switchData: dict, Ybus: np.ndarray, busType
         
 
     return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
-
-
+"""
 
 
 def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.ndarray, busTypes: dict):
