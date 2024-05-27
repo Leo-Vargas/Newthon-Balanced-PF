@@ -2,24 +2,28 @@ class Topology:
     def __init__(self):
         self.topology = {}
 
-    def addBus(self, u, v):
-        self._addBusHelper(u, v)
-        self._addBusHelper(v, u)  # Undirected topology, so add both directions
+    def addLine(self, u, v):
+        self._addLineHelper(u, v)
+        self._addLineHelper(v, u)  # Undirected topology, so add both directions
 
-    def _addBusHelper(self, u, v):
+    def _addLineHelper(self, u, v):
         if u not in self.topology:
             self.topology[u] = []
         if v not in self.topology[u]:
             self.topology[u].append(v)
 
-    def openLine(self, u, v):
+    def openLineOdd(self, u, v):
         if u in self.topology and v in self.topology[u]:
             self.topology[u].remove(v)
             self.topology[v].remove(u)
-        if not self._searchTopology(v, 1):
+        if not self._searchTopology(v, 0):
             self._removeBus(v)
-        if not self._searchTopology(u, 1):
+        if not self._searchTopology(u, 0):
             self._removeBus(u)
+    
+    def openLineEven(self, u, v):
+        self.openLineOdd(u, v)
+        self.addLine(u, v)
             
 
     def _removeBus(self, bus):
@@ -67,13 +71,13 @@ class Topology:
 # Example usage:
 if __name__ == "__main__":
     topology = Topology()
-    topology.addBus(1, 2)
-    topology.addBus(1, 3)
-    topology.addBus(2, 3)
-    topology.addBus(3, 4)
-    topology.addBus(4, 5)
-    topology.addBus(5, 6)
-    topology.addBus(6, 2)
+    topology.addLine(1, 2)
+    topology.addLine(1, 3)
+    topology.addLine(2, 3)
+    topology.addLine(3, 4)
+    topology.addLine(4, 5)
+    topology.addLine(5, 6)
+    topology.addLine(6, 2)
 
     print("topology before removing line 1 -> 3:")
     topology.printTopology2()

@@ -1,6 +1,7 @@
 import numpy as np
 from functions import readYbus
 from filePath import IEEE30BusPath, IEEE14BusPath
+from Topology import Topology
 
 def IEEE30Bus():
     Ybus = readYbus(IEEE30BusPath)
@@ -187,10 +188,10 @@ def Ghendy4Bus():
 def Switch4Bus(switches: int = 0):
 
     Ybus = np.array([
-        (1/(0.0236+0.0233j)+1/0.001j, -1/(0.0236+0.0233j), 0, 0),
+        (1/(0.0236+0.0233j)+0.001j, -1/(0.0236+0.0233j), 0, 0),
         (-1/(0.0236+0.0233j), 1/(0.0236+0.0233j) + 1/(0.045+0.030j) + 1/(0.0051+0.0005j) + 0.003j, -1/(0.045+0.030j), -1/(0.0051+0.0005j)),
         (0, -1/(0.045+0.030j), 1/(0.045+0.030j) + 0.001j, 0),
-        (0, 0, -1/(0.0051+0.0005j), 1/(0.0051+0.005j) + 0.001j),
+        (0, 0, -1/(0.0051+0.0005j), 1/(0.0051+0.0005j) + 0.001j),
     ])
 
     busTypes = {
@@ -208,12 +209,10 @@ def Switch4Bus(switches: int = 0):
         6: np.array([1, 3])
     }
 
-    gridTopology = {
-        0: [1],
-        1: [2, 3],
-        2: [],
-        3: []
-    }
+    gridTopology = Topology()
+    gridTopology.addLine(0, 1)
+    gridTopology.addLine(1, 2)
+    gridTopology.addLine(1, 3)
 
     voltages = np.array([1.03, 1.0, 1.0, 1.0])
     angles = np.zeros(voltages.shape[0])
@@ -233,7 +232,8 @@ def Switch4Bus(switches: int = 0):
         'loadsMvar': loadsMvar,
         'generationMw': generationMw,
         'generationMvar': generationMvar,
-        'switches': switchData
+        'switches': switchData,
+        'gridTopology': gridTopology
     }
 
     return caseData

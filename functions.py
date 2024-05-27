@@ -1,24 +1,58 @@
 import numpy as np
+import copy
+from Topology import Topology
 
-"""
-def openSwitch(switches: np.ndarray, switchData: dict, Ybus: np.ndarray, busTypes: dict, voltages: np.ndarray, angles: np.ndarray, loadsMw: np.ndarray, loadsMvar: np.ndarray, generationMw: np.ndarray, generationMvar: np.ndarray):
 
-    switchesSorted = np.sort(switches)[::-1]
-
-    for switch in switches:
-        if switch % 2 == 0:
-            generationMw[switchData[switch][1]] = 0.0
-            generationMvar[switchData[switch][1]] = 0.0
+def openSwitches(caseData: dict, switches: list = [-1]):
+    """switches must be real positive integeres within the system existing switches"""
+    originalTopology = copy.deepcopy(caseData['gridTopology'].topology)
+    cuttedBuses = []
+    cuttedBusesTypes = []
+    for switch in switches: 
+        if switch <= 0 or switch == []:
+            return caseData
+        if switch not in caseData['switches']:
+            print(f'chave {switch} não encontrada no sistema')
+            print('')
         else:
-            generationMw = np.delete(generationMw, switchData[switch][1])
-            generationMvar = np.delete(generationMvar, switchData[switch[1]])
-
+            if switch % 2 != 0:
+                caseData['gridTopology'].openLineOdd(caseData['switches'][switch][0], caseData['switches'][switch][1])
+            else:
+                caseData['gridTopology'].openLineEven(caseData['switches'][switch][0], caseData['switches'][switch][1])
+                caseData['loadsMw'][caseData['switches'][switch][1]] = 0.0
+                caseData['loadsMvar'][caseData['switches'][switch][1]] = 0.0
+                caseData['generationMw'][caseData['switches'][switch][1]] = 0.0
+                caseData['generationMvar'][caseData['switches'][switch][1]] = 0.0
         
-        
+    for bus in originalTopology:
+        if bus not in caseData['gridTopology'].topology.keys():
+            cuttedBuses.append(bus)
+            for busType in caseData['busTypes']:
+                if busType != 'SLACK' and caseData['busTypes'][busType].shape[0] != 0:
+                    for i in range(caseData['busTypes'][busType].shape[0]):
+                        if bus == (caseData['busTypes'][busType][i] - 1):
+                            cuttedBusesTypes.append(i)
 
-    return [Ybus, busTypes, voltages, angles, loadsMw, loadsMvar, generationMw, generationMvar]
-"""
+                    caseData['busTypes'][busType] = np.delete(caseData['busTypes'][busType], cuttedBusesTypes)
+                    cuttedBusesTypes = []
+    
+    for i in range(caseData['Ybus'].shape[0]):
+        for cuttedBus in cuttedBuses:
+            caseData['Ybus'][i,i] += caseData['Ybus'][i, cuttedBus]
+    
+                                
 
+    caseData['Ybus']=np.delete(caseData['Ybus'], cuttedBuses, axis=0)
+    caseData['Ybus']=np.delete(caseData['Ybus'], cuttedBuses, axis=1)
+    caseData['voltages']=np.delete(caseData['voltages'], cuttedBuses)
+    caseData['angles']=np.delete(caseData['angles'], cuttedBuses)
+    caseData['loadsMw']=np.delete(caseData['loadsMw'], cuttedBuses)
+    caseData['loadsMvar']=np.delete(caseData['loadsMvar'], cuttedBuses)
+    caseData['generationMw']=np.delete(caseData['generationMw'], cuttedBuses)
+    caseData['generationMvar']=np.delete(caseData['generationMvar'], cuttedBuses) 
+
+            
+    return caseData
 
 def JacobianCalculatorV2(Ybus: np.ndarray,  voltages: np.ndarray, angles: np.ndarray, busTypes: dict):
 
