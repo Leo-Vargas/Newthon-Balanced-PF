@@ -99,7 +99,7 @@ def calculatePQ(Ybus:np.ndarray, angles: np.ndarray, voltages: np.ndarray, busTy
 
     fasorVoltages = voltages*np.exp(1.j*angles*np.pi/180)
 
-    print(Ybus@fasorVoltages)
+    
     calculatedS = fasorVoltages*(np.conj(Ybus@fasorVoltages))
 
 

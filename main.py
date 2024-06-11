@@ -14,13 +14,14 @@ print('------------- Load case Data -----------------')
 
 
 caseData = Switch4Bus()
-print(caseData['Ybus'])
+print(np.absolute(caseData['Ybus']))
+print(np.angle(caseData['Ybus'], deg=True))
 print('')
 
 
 print('-------------- Opening Switches --------------')
 
-caseData = openSwitches(caseData, switches=[5])
+#caseData = openSwitches(caseData, switches=[])
 print(caseData['Ybus'])
 
 

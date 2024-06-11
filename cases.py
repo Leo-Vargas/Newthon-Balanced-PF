@@ -185,13 +185,13 @@ def Ghendy4Bus():
     return caseData
 
 
-def Switch4Bus(switches: int = 0):
+def Switch4Bus():
 
     Ybus = np.array([
-        (1/(0.0236+0.0233j)+0.001j, -1/(0.0236+0.0233j), 0, 0),
-        (-1/(0.0236+0.0233j), 1/(0.0236+0.0233j) + 1/(0.045+0.030j) + 1/(0.0051+0.0005j) + 0.003j, -1/(0.045+0.030j), -1/(0.0051+0.0005j)),
-        (0, -1/(0.045+0.030j), 1/(0.045+0.030j) + 0.001j, 0),
-        (0, 0, -1/(0.0051+0.0005j), 1/(0.0051+0.0005j) + 0.001j),
+        ((1/(0.0236+0.0233j))+0.001j, -1/(0.0236+0.0233j), 0 + 0j, 0 + 0j),
+        (-1/(0.0236+0.0233j), (1/(0.0236+0.0233j)) + (1/(0.045+0.03j)) + (1/(0.0051+0.0005j)) + 0.003j, -1/(0.045+0.03j), -1/(0.0051+0.0005j)),
+        (0 + 0j, -1/(0.045+0.03j), (1/(0.045+0.03j)) + 0.001j, 0 + 0j),
+        (0 + 0j, -1/(0.0051+0.0005j), 0 + 0j, (1/(0.0051+0.0005j)) + 0.001j),
     ])
 
     busTypes = {
@@ -215,13 +215,13 @@ def Switch4Bus(switches: int = 0):
     gridTopology.addLine(1, 3)
 
     voltages = np.array([1.03, 1.0, 1.0, 1.0])
-    angles = np.zeros(voltages.shape[0])
+    angles = np.array([0.0, 0.0, 0.0, 0.0])
 
     loadsMw = np.array([0.0, 1.28, 0.32, 1.6])*100
     loadsMvar = np.array([0.0, 1.28, 0.16, 0.8])*100
 
-    generationMw = np.zeros(voltages.shape[0])
-    generationMvar = np.zeros(voltages.shape[0])
+    generationMw = np.array([0.0, 0.0, 0.0, 0.0])
+    generationMvar = np.array([0.0, 0.0, 0.0, 0.0])
 
     caseData = {
         'Ybus': Ybus,
