@@ -144,7 +144,7 @@ def IEEE14Bus():
     return caseData
 
 
-def Ghendy4Bus():
+def Class4Bus():
     Ybus = np.array([
         (21.457-21.185j, -21.457+21.185j, 0, 0),
         (-21.457+21.185j, 2328.149779016-1559.646245j, -2306.69231+1538.461538j, 0),
@@ -234,6 +234,83 @@ def Switch4Bus():
         'generationMvar': generationMvar,
         'switches': switchData,
         'gridTopology': gridTopology
+    }
+
+    return caseData
+
+def Class5Bus():
+    Ybus = np.array([
+        ((1/(0.05+0.11j)) + (1/(0.05+0.11j)) + (1/(0.03+0.08j)) + 0.03j, -1/(0.05+0.11j), -1/(0.05+0.11j), 0, -1/(0.03+0.08j)),
+        (-1/(0.05+0.11j), (1/(0.05+0.11j)) + (1/(0.04+0.09j)) + (1/(0.04+0.09j)) + 0.03j, -1/(0.04+0.09j), 0, -1/(0.04+0.09j)),
+        (-1/(0.05+0.11j), -1/(0.04+0.09j), (1/(0.05+0.11j)) + (1/(0.04+0.09j)) + (1/(0.06+0.13j)) + 0.035j, -1/(0.06+0.13j), 0),
+        (0, 0, -1/(0.06+0.13j), (1/(0.06+0.13j)) + (1/(0.04+0.09j)) + 0.025j, -1/(0.04+0.09j)),
+        (-1/(0.03+0.08j), -1/(0.04+0.09j), 0, -1/(0.04+0.09j), (1/(0.03+0.08j)) + (1/(0.04+0.09j)) + (1/(0.04+0.08j)) + 0.03j)
+    ])
+
+    busTypes = {
+        'SLACK': np.array([1, ]),
+        'PV': np.array([]),
+        'PQ': np.array([2, 3, 4, 5])
+    }
+
+    voltages = np.array([1.0, 1.0, 1.0, 1.0, 1.0])
+    angles = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+
+    loadsMw = np.array([0.0, 40.0, 25.0, 40.0, 50.0])
+    loadsMvar = np.array([0.0, 20.0, 15.0, 20.0, 20.0])
+
+    generationMw = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+    generationMvar = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
+    }
+
+    return caseData
+
+def Class5BusOpened():
+    Ybus = np.array([
+        ((1/(0.05+0.11j)) + (1/(0.05+0.11j)) + (1/(0.03+0.08j)) + 0.03j, -1/(0.05+0.11j), -1/(0.05+0.11j), 0, 0, -1/(0.03+0.08j), 0, 0),
+        (-1/(0.05+0.11j), (1/(0.05+0.11j)) + (1/(0.04+0.09j)) + (1/(0.04+0.09j)) + 0.03j, 0, -1/(0.04+0.09j), 0, 0, 0, -1/(0.04+0.09j)),
+        (-1/(0.05+0.11j), 0, (1/(0.05+0.11j)) + (1/(0.06+0.13j)) + 0.025j, 0, -1/(0.06+0.13j), 0, 0, 0),
+        (0, -1/(0.04+0.09j), 0, 1/(0.04+0.09j) + 0.01j, 0, 0, 0, 0),
+        (0, 0, -1/(0.06+0.13j), 0, (1/(0.06+0.13j)) + (1/(0.04+0.09j)) + 0.025j, 0, -1/(0.04+0.09j), 0),
+        (-1/(0.03+0.08j), 0, 0, 0, 0, (1/(0.03+0.08j)) + 0.01j, 0, 0),
+        (0, 0, 0, 0, -1/(0.04+0.09j), 0, (1/(0.04+0.09j)) + 0.01j, 0),
+        (0, -1/(0.04+0.09j), 0, 0, 0, 0, 0, (1/(0.04+0.09j)) + 0.01j),
+    ])
+
+    busTypes = {
+        'SLACK': np.array([1, ]),
+        'PV': np.array([]),
+        'PQ': np.array([2, 3, 4, 5, 6, 7, 8])
+    }
+
+    voltages = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    angles = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+    loadsMw = np.array([0.0, 40.0, 12.5, 12.5, 40.0, 50.0/3, 50.0/3, 50.0/5])
+    loadsMvar = np.array([0.0, 20.0, 7.5, 7.5, 20.0, 20.0/3, 20.0/3, 20.0/3])
+
+    generationMw = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    generationMvar = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+    caseData = {
+        'Ybus': Ybus,
+        'busTypes': busTypes,
+        'voltages': voltages,
+        'angles': angles,
+        'loadsMw': loadsMw,
+        'loadsMvar': loadsMvar,
+        'generationMw': generationMw,
+        'generationMvar': generationMvar,
     }
 
     return caseData

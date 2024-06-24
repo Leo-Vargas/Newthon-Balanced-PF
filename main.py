@@ -1,7 +1,7 @@
 import numpy as np
 from functions import openSwitches
 from powerFlow import solveNRPF
-from cases import IEEE30Bus, Saadat3Bus, IEEE14Bus, Ghendy4Bus, Switch4Bus
+from cases import IEEE30Bus, Saadat3Bus, IEEE14Bus, Class4Bus, Switch4Bus, Class5Bus, Class5BusOpened
 
 # ----------------------- CONFIG ---------------------------
 np.set_printoptions(precision=3)
@@ -13,9 +13,10 @@ baseMVA = 100
 print('------------- Load case Data -----------------')
 
 
-caseData = Switch4Bus()
+caseData = Class5BusOpened()
 print(np.absolute(caseData['Ybus']))
 print(np.angle(caseData['Ybus'], deg=True))
+print(f'is Ybus symmetric? {np.allclose(caseData['Ybus'], caseData['Ybus'].T, rtol=1e-05, atol=1e-08)}')
 print('')
 
 
