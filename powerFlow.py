@@ -48,10 +48,10 @@ def solveNRPF(caseData: dict, BaseMVA: float = 100.0, StopCondition: float = 0.0
         for i in range(deltaPQvector.shape[0]):
             print(f'DeltaPQ{i} = {scheduledPQvector[i]} - {calculatedPQvector[i]} = {deltaPQvector[i]}')
 
-        print(f'tensões iteração {iterations} = {caseData['voltages']}')
-        print(f'angulos iteração {iterations} = {caseData['angles']}')
+        print(f'tensões iteração {iterations} = {caseData["voltages"]}')
+        print(f'angulos iteração {iterations} = {caseData["angles"]}')
 
     print('-------------------------------------------')
     print('')
-    print(f'tensões finais = {caseData['voltages']}')
-    print(f'angulos finais = {caseData['angles']}')
+    print(f'tensões finais = {caseData["voltages"]}')
+    print(f'angulos finais = {caseData["angles"]}')

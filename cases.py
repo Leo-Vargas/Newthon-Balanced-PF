@@ -1,6 +1,6 @@
 import numpy as np
 from functions import readYbus
-from filePath import IEEE30BusPath, IEEE14BusPath
+#from filePath import IEEE30BusPath, IEEE14BusPath
 from Topology import Topology
 
 def IEEE30Bus():

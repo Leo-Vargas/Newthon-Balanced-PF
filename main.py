@@ -16,7 +16,7 @@ print('------------- Load case Data -----------------')
 caseData = Class5BusOpened()
 print(np.absolute(caseData['Ybus']))
 print(np.angle(caseData['Ybus'], deg=True))
-print(f'is Ybus symmetric? {np.allclose(caseData['Ybus'], caseData['Ybus'].T, rtol=1e-05, atol=1e-08)}')
+print(f'is Ybus symmetric? {np.allclose(caseData["Ybus"], caseData["Ybus"].T, rtol=1e-05, atol=1e-08)}')
 print('')
 
 
