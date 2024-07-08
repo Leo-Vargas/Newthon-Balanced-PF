@@ -1,10 +1,10 @@
 import numpy as np
 from functions import openSwitches
-from powerFlow import solveNRPF
+from powerFlow import solveNRPF, solveCNRPF
 from cases import IEEE30Bus, Saadat3Bus, IEEE14Bus, Class4Bus, Switch4Bus, Class5Bus, Class5BusOpened
 
 # ----------------------- CONFIG ---------------------------
-np.set_printoptions(precision=3)
+np.set_printoptions(precision=4)
 stopCondition = 0.001
 maxIter = 10
 baseMVA = 100
@@ -29,6 +29,7 @@ print(caseData['Ybus'])
 print('')
 print('--------------- Calculations ---------------')
 if caseData['Ybus'].shape[0] > 1:
-    solveNRPF(caseData, BaseMVA=baseMVA, StopCondition=stopCondition, MaxIter=maxIter)
+    solveCNRPF(caseData, BaseMVA=baseMVA, StopCondition=stopCondition, MaxIter=maxIter)
 else:
     print('o sistema está em aberto e não pode ser resolvido')
+
