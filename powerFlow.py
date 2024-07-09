@@ -118,18 +118,39 @@ def solveCNRPF(caseData: dict, BaseMVA: float = 100.0, StopCondition: float = 0.
             voltagesRecord.append(copy.deepcopy(caseData['voltages']))
             loadsRecord.append(copy.deepcopy(caseData['loadsMw']))
 
-            caseData['loadsMw']*=1.01
-            caseData['loadsMvar']*=1.01
+            caseData['loadsMw']*=1.005
+            caseData['loadsMvar']*=1.005
         except:
             break
 
 
     print(len(voltagesRecord))
+
+    num_elements = caseData['busTypes']['PQ'].shape[0]
+    rows = 2
+    cols = (num_elements + 1) // 2
+    plt.figure(figsize=(12, 4))
+
+    i = 0
     for loadBus in caseData['busTypes']['PQ']:
         y = [voltage[loadBus-1] for voltage in voltagesRecord]
         x = [load[loadBus-1] for load in loadsRecord]
-        plt.plot(x,y)
     
+        
+        plt.subplot(rows, cols, i + 1)
+        plt.plot(x, y)
+        plt.title(f'Curva V-P Barra {loadBus}')
+        plt.xlabel(f'P (MW)')
+        plt.ylabel(f'V (PU)')
+        plt.ylim(0.4, 1)
+        i+=1
+        print(f'tensões {y}')
+        print(f'potencias {x}')
+        print()
 
+    # Show the plots
+    plt.tight_layout()
     plt.show()
+
+
 

@@ -29,7 +29,7 @@ print(caseData['Ybus'])
 print('')
 print('--------------- Calculations ---------------')
 if caseData['Ybus'].shape[0] > 1:
-    solveCNRPF(caseData, BaseMVA=baseMVA, StopCondition=stopCondition, MaxIter=maxIter)
+    solveNRPF(caseData, BaseMVA=baseMVA, StopCondition=stopCondition, MaxIter=maxIter)
 else:
     print('o sistema está em aberto e não pode ser resolvido')
 
